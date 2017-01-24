@@ -1,12 +1,15 @@
 #2016-2017 PERSONAL PROJECTS: TurtleChat!
 #WRITE YOUR NAME HERE!
-
+ 
 #####################################################################################
 #                                   IMPORTS                                         #
 #####################################################################################
 #import the turtle module
+import turtle
 #import the Client class from the turtle_chat_client module
+from turtle_chat_client import Client
 #Finally, from the turtle_chat_widgets module, import two classes: Button and TextInput
+from turtle_chat_widgets import Button, TextInput
 #####################################################################################
 #####################################################################################
 
@@ -35,6 +38,17 @@
 #
 #3. If you want to make a newline character (i.e. go to the next line), just add
 #   \r to your string.  Test it out at the Python shell for practice
+class TextBox (TextInput):
+    def draw_box(self):
+        self.writer.penup()
+        self.writer.goto(pos)
+        self.writer.pendown()
+        self.writer.goto(0, height)
+        self.writer.goto(width, height)
+
+    def write_msg(self):
+        pass
+    
 #####################################################################################
 #####################################################################################
 
@@ -77,6 +91,12 @@ class View:
         :param username: the name of this chat user
         :param partner_name: the name of the user you are chatting with
         '''
+        self.username=username
+        self.partner_name=partner_name
+
+        self.my_client= Client(username, partner_name)
+        
+        
         ###
         #Store the username and partner_name into the instance.
         ###
