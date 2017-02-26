@@ -114,6 +114,8 @@ class View:
         This method should update the messages displayed in the screen.
         You can get the messages you want from self.msg_queue
         '''
+        self.turtle1=turtle.clone()
+        
         self.display.clear()
         self.display.write(self.msg_queue[0])
 ##############################################################
