@@ -1,101 +1,40 @@
 #2016-2017 PERSONAL PROJECTS: TurtleChat!
 #WRITE YOUR NAME HERE!
 "Rajai"
-#####################################################################################
-#                                   IMPORTS                                         #
-#####################################################################################
-#import the turtle module
+
 import turtle
 #import the Client class from the turtle_chat_client module
 from turtle_chat_client import Client
 #Finally, from the turtle_chat_widgets module, import two classes: Button and TextInput
 from turtle_chat_widgets import Button, TextInput
-#####################################################################################
-#####################################################################################
 
-#####################################################################################
-#                                   TextBox                                         #
-#####################################################################################
-#Make a class called TextBox, which will be a subclass of TextInput.
-#Because TextInput is an abstract class, you must implement its abstract
-#methods.  There are two:
-#
-#draw_box
-#write_msg
-#
-#Hints:
-#1. in draw_box, you will draw (or stamp) the space on which the user's input
-#will appear.
-#
-#2. All TextInput objects have an internal turtle called writer (i.e. self will
-#   have something called writer).  You can write new text with it using code like
-#
-#   self.writer.write(a_string_variable)
-#
-#   and you can erase that text using
-#
-#   self.writer.clear()
-#
-#3. If you want to make a newline character (i.e. go to the next line), just add
-#   \r to your string.  Test it out at the Python shell for practice
 class TextBox(TextInput):
     def draw_box(self):
         
         self.draw = turtle.clone()
         self.draw.hideturtle()
         self.draw.penup()
-        self.draw.goto(-300,-275)
+        self.draw.goto(self.width/2,0)
         self.draw.pendown()
-        self.draw.goto(-300,-275)
-        self.draw.goto(-300,-200)
-        self.draw.goto(150,-200)
-        self.draw.goto(150,-275)
-        self.draw.goto(-300,-275)
-        self.draw.penup()
-
-        self.draw.stamp()
-        print('hi')
-
+        self.draw.goto(-self.width/2,0)
+        self.draw.goto(-self.width/2,-self.height)
+        self.draw.goto(self.width/2, -self.height)
+        self.draw.goto(self.width/2,0)
       
-    
+
     def write_msg(self):
-        self.writer.hideturtle()
-        self.writer.penup()
-        self.writer.goto(-292,-235)
         self.writer.clear()
         self.writer.write(self.new_msg, font=('Cambria', 17,))
+
     
-#####################################################################################
-#####################################################################################
+class SendButton(Button):
+    def __init__(self, view):
+        super(SendButton,self).__init__(my_turtle=None, shape=None, pos=(0,-150))
+        self.view=view
+        
+    def fun(self, x=None, y=None):
+        self.view.send_msg()
 
-#####################################################################################
-#                                  SendButton                                       #
-#####################################################################################
-#Make a class called SendButton, which will be a subclass of Button.
-#Button is an abstract class with one abstract method: fun.
-#fun gets called whenever the button is clicked.  It's jobs will be to
-#
-# 1. send a message to the other chat participant - to do this,
-#    you will need to call the send method of your Client instance
-# 2. update the messages that you see on the screen
-#
-#HINT: You may want to override the __init__ method so that it takes one additional
-#      input: view.  This will be an instance of the View class you will make next
-#      That class will have methods inside of it to help
-#      you send messages and update message displays.
-#####################################################################################
-#####################################################################################
-
-
-##################################################################
-#                             View                               #
-##################################################################
-#Make a new class called View.  It does not need to have a parent
-#class mentioned explicitly.
-#
-#Read the comments below for hints and directions.
-##################################################################
-##################################################################
 class View:
     _MSG_LOG_LENGTH=5 #Number of messages to retain in view
     _SCREEN_WIDTH=300
@@ -103,54 +42,22 @@ class View:
     _LINE_SPACING=round(_SCREEN_HEIGHT/2/(_MSG_LOG_LENGTH+1))
 
     def __init__(self,username='Me',partner_name='Partner'):
-        '''
-        :param username: the name of this chat user
-        :param partner_name: the name of the user you are chatting with
-        '''
+
         self.username=username
         self.partner_name=partner_name
+        self.my_client= Client()
+        turtle.setup(width = self._SCREEN_WIDTH, height= self._SCREEN_HEIGHT)
 
-        self.my_client= Client(username, partner_name)
-        
-        
-        ###
-        #Store the username and partner_name into the instance.
-        ###
-
-        #Make a new client object and store it in this instance.
-
-        #Set screen dimensions using turtle.setup
-        #You can get help on this function, as with other turtle functions,
-        #by typing
-        #
-        #   import turtle
-        #   help(turtle.setup)
-        #
-        #at the Python shell.
-
-        #This list will store all of the messages.
-        #You can add strings to the front of the list using
-        #   self.msg_queue.insert(0,a_msg_string)
-        #or at the end of the list using
-        #   self.msg_queue.append(a_msg_string)
         self.msg_queue=[]
+        self.display=turtle.clone()
+        self.display.hideturtle()
+        self.display.penup()
+        self.display.goto(-100,100)
+        self.textbox = TextBox()
+        self.sendbutton = SendButton(self)
 
-        ###
-        #Create one turtle object for each message to display.
-        #You can use the clear() and write() methods to erase
-        #and write messages for each
-        ###
-
-        ###
-        #Create a TextBox instance and a SendButton instance and
-        #Store them inside of this instance
-        ###
-
-        ###
-        #Call your setup_listeners() function, if you have one,
-        #and any other remaining setup functions you have invented.
-        ###
-
+        self.setup_listeners()
+    
     def send_msg(self):
         '''
         You should implement this method.  It should call the
@@ -161,7 +68,10 @@ class View:
         It should call self.display_msg() to cause the message
         display to be updated.
         '''
-        pass
+        self.my_client.send(self.textbox.new_msg)
+        self.msg_queue.insert(0,self.textbox.new_msg)
+        self.textbox.clear_msg()
+        self.display_msg()
 
     def get_msg(self):
         return self.textbox.get_msg()
@@ -177,7 +87,8 @@ class View:
 
         Then, it can call turtle.listen()
         '''
-        pass
+        turtle.onkeypress(self.sendbutton.fun, 'Return')
+        turtle.listen()
 
     def msg_received(self,msg):
         '''
@@ -190,6 +101,8 @@ class View:
         '''
         print(msg) #Debug - print message
         show_this_msg=self.partner_name+' says:\r'+ msg
+        self.msg_queue.insert(0,show_this_msg)
+        self.display_msg()
         #Add the message to the queue either using insert (to put at the beginning)
         #or append (to put at the end).
         #
@@ -200,7 +113,8 @@ class View:
         This method should update the messages displayed in the screen.
         You can get the messages you want from self.msg_queue
         '''
-        pass
+        self.display.clear()
+        self.display.write(self.msg_queue[0])
 ##############################################################
 ##############################################################
 
