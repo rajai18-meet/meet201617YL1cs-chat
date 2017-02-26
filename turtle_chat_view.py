@@ -7,7 +7,8 @@ import turtle
 from turtle_chat_client import Client
 #Finally, from the turtle_chat_widgets module, import two classes: Button and TextInput
 from turtle_chat_widgets import Button, TextInput
-
+lamborghini = turtle.Screen()
+lamborghini.bgpic('gtrr.gif')
 class TextBox(TextInput):
     def draw_box(self):
         
@@ -47,9 +48,9 @@ class View:
         self.partner_name=partner_name
         self.my_client= Client()
         turtle.setup(width = self._SCREEN_WIDTH, height= self._SCREEN_HEIGHT)
-
         self.msg_queue=[]
         self.display=turtle.clone()
+        self.display.hideturtle()
         self.display.hideturtle()
         self.display.penup()
         self.display.goto(-100,100)
