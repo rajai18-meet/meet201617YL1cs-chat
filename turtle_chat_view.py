@@ -30,7 +30,8 @@ class TextBox(TextInput):
     
 class SendButton(Button):
     def __init__(self, view):
-        super(SendButton,self).__init__(my_turtle=None, shape=None, pos=(0,-150))
+        image= 'family.gif'
+        super(SendButton,self).__init__(my_turtle=None, shape=image, pos=(0,-150))
         self.view=view
         
     def fun(self, x=None, y=None):
